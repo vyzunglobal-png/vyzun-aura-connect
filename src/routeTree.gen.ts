@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ReelsRouteImport } from './routes/reels'
+import { Route as AskUsernameRouteImport } from './routes/ask.$username'
+import { Route as SecretsIndexRouteImport } from './routes/secrets.index'
+import { Route as SecretsChatRouteImport } from './routes/secrets.chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReelsRoute = ReelsRouteImport.update({
+  id: '/reels',
+  path: '/reels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskUsernameRoute = AskUsernameRouteImport.update({
+  id: '/ask/$username',
+  path: '/ask/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecretsIndexRoute = SecretsIndexRouteImport.update({
+  id: '/secrets/',
+  path: '/secrets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecretsChatRoute = SecretsChatRouteImport.update({
+  id: '/secrets/chat',
+  path: '/secrets/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/messages': typeof MessagesRoute
+  '/profile': typeof ProfileRoute
+  '/reels': typeof ReelsRoute
+  '/ask/$username': typeof AskUsernameRoute
+  '/secrets/chat': typeof SecretsChatRoute
+  '/secrets/': typeof SecretsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/messages': typeof MessagesRoute
+  '/profile': typeof ProfileRoute
+  '/reels': typeof ReelsRoute
+  '/ask/$username': typeof AskUsernameRoute
+  '/secrets/chat': typeof SecretsChatRoute
+  '/secrets': typeof SecretsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/messages': typeof MessagesRoute
+  '/profile': typeof ProfileRoute
+  '/reels': typeof ReelsRoute
+  '/ask/$username': typeof AskUsernameRoute
+  '/secrets/chat': typeof SecretsChatRoute
+  '/secrets/': typeof SecretsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/messages'
+    | '/profile'
+    | '/reels'
+    | '/ask/$username'
+    | '/secrets/chat'
+    | '/secrets/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/messages'
+    | '/profile'
+    | '/reels'
+    | '/ask/$username'
+    | '/secrets/chat'
+    | '/secrets'
+  id:
+    | '__root__'
+    | '/'
+    | '/messages'
+    | '/profile'
+    | '/reels'
+    | '/ask/$username'
+    | '/secrets/chat'
+    | '/secrets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MessagesRoute: typeof MessagesRoute
+  ProfileRoute: typeof ProfileRoute
+  ReelsRoute: typeof ReelsRoute
+  AskUsernameRoute: typeof AskUsernameRoute
+  SecretsChatRoute: typeof SecretsChatRoute
+  SecretsIndexRoute: typeof SecretsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reels': {
+      id: '/reels'
+      path: '/reels'
+      fullPath: '/reels'
+      preLoaderRoute: typeof ReelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask/$username': {
+      id: '/ask/$username'
+      path: '/ask/$username'
+      fullPath: '/ask/$username'
+      preLoaderRoute: typeof AskUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/secrets/': {
+      id: '/secrets/'
+      path: '/secrets'
+      fullPath: '/secrets/'
+      preLoaderRoute: typeof SecretsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/secrets/chat': {
+      id: '/secrets/chat'
+      path: '/secrets/chat'
+      fullPath: '/secrets/chat'
+      preLoaderRoute: typeof SecretsChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MessagesRoute: MessagesRoute,
+  ProfileRoute: ProfileRoute,
+  ReelsRoute: ReelsRoute,
+  AskUsernameRoute: AskUsernameRoute,
+  SecretsChatRoute: SecretsChatRoute,
+  SecretsIndexRoute: SecretsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

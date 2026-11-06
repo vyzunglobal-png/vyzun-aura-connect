@@ -14,4 +14,14 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+  it("opens the dedicated full-screen messages page", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes("/messages").at(-1)?.routeId).toBe("/messages");
+  });
+  it("resolves a recipient secret-drop deep link", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const match = router.matchRoutes("/ask/@aurafan").at(-1);
+    expect(match?.routeId).toBe("/ask/$username");
+    expect(match?.params).toMatchObject({ username: "@aurafan" });
+  });
 });

@@ -1,0 +1,7 @@
+CREATE OR REPLACE FUNCTION public.block_secret_sender(_message_id uuid) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$ DECLARE _sender uuid; BEGIN IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Unauthorized'; END IF; SELECT sender_id INTO _sender FROM public.secret_messages WHERE id = _message_id AND recipient_id = auth.uid(); IF _sender IS NULL THEN RAISE EXCEPTION 'Sender unavailable'; END IF; INSERT INTO public.user_restrictions(user_id,target_id,kind) VALUES(auth.uid(),_sender,'block') ON CONFLICT(user_id,target_id,kind) DO NOTHING; UPDATE public.secret_messages SET is_hidden = true WHERE recipient_id = auth.uid() AND sender_id = _sender; END; $$;
+REVOKE ALL ON FUNCTION public.block_secret_sender(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.block_secret_sender(uuid) TO authenticated;
+REVOKE INSERT ON public.secret_messages FROM authenticated;
+GRANT ALL ON public.secret_messages TO service_role;
+COMMENT ON FUNCTION public.block_secret_sender(uuid) IS 'Blocks an anonymous sender without returning their identity. Verifies current user owns the message.';
+COMMENT ON TABLE public.secret_messages IS 'New messages are written only by server-side moderated delivery; authenticated clients cannot bypass moderation with direct inserts.';

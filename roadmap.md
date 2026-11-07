@@ -42,3 +42,11 @@ Store approval, complete privacy compliance and production safety certification 
 - [ ] Aura card: dynamic daily vibe treatment, daily prompt, streak display, premium 9:16 visual polish, and story share row.
 - [ ] Reels header: remove category tabs; keep only transparent top-right Create Reel action.
 - [ ] Keep activity-based scoring, notifications, and streak increments truthful to connected data; no fabricated activity or delivery.
+
+## New tasks (Nov 7)
+- [ ] Fix missing logo: old asset pointer referenced the previous project; generate a new VYZUN logo asset and rewire Logo.tsx.
+- [ ] Rebuild Reels tab UI: neon gradient cosmic background, glowing category pills (For You/Vibe With/Trending), search icon left, glowing + Create Reel right, squircle creator DP with neon aura ring, purple-pink + Vibe With button, bold right-side engagement sidebar (Like/Flame/Comments/Vibe Clash/Share-Save) with white counts, share-or-download action.
+- [ ] VYZUN AI pinned neon chat in Direct Chats with Verified Vibe Guide badge, concierge answers, CTA buttons, 3 onboarding starter chips.
+- [ ] Direct Chats button to top-right of Secrets header; Scan tab keeps only $4.99 reveal CTA ($2.99 Boost to aura overlay, $1.99 Pass to Campus Map); Profile banners (Platinum Pass, Creator Dashboard) into Settings drawer; Trophy Cabinet horizontal row.
+- [ ] 3D cut-corner holographic Aura Card: 45° chamfered corners, double neon purple/cyan border, glowing ring portrait, ULTRA RARE crown, 4 stat gauges, aura orbs, AI quote, SHARE/SAVE buttons.
+- [ ] Embed vyzun.global@gmail.com in Profile Settings, Help, Privacy footers.

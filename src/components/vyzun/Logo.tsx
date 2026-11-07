@@ -1,4 +1,4 @@
-import logoUrl from "@/assets/vyzun-logo.png";
+import logoUrl from "@/assets/vyzun-logo.jpg";
 import { cn } from "@/lib/utils";
 
 /**

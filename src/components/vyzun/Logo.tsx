@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/vyzun-logo.asset.json";
+import logoUrl from "@/assets/vyzun-logo.png";
 import { cn } from "@/lib/utils";
 
 /**

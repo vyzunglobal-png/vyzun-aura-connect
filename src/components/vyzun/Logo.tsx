@@ -16,7 +16,7 @@ export function Logo({
   if (!assembling) {
     return (
       <img
-        src={logoAsset.url}
+        src={logoUrl}
         alt="VYZUN"
         className={cn("select-none rounded-[28%] object-contain", className)}
         draggable={false}
@@ -27,7 +27,7 @@ export function Logo({
   return (
     <div className={cn("relative anim-snap", className)}>
       <img
-        src={logoAsset.url}
+        src={logoUrl}
         alt=""
         aria-hidden
         className="anim-shard-left absolute inset-0 h-full w-full rounded-[28%] object-contain"
@@ -35,7 +35,7 @@ export function Logo({
         draggable={false}
       />
       <img
-        src={logoAsset.url}
+        src={logoUrl}
         alt="VYZUN"
         className="anim-shard-right absolute inset-0 h-full w-full rounded-[28%] object-contain"
         style={{ clipPath: "polygon(52% 0, 100% 0, 100% 100%, 52% 100%)" }}

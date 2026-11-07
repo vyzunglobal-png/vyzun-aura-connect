@@ -175,7 +175,7 @@ function ReelsPage() {
           </section>
         ) : (
           <section id={`reel-${item.reel.id}`} key={item.reel.id} className="relative h-[calc(100dvh-4.5rem)] w-full snap-start overflow-hidden">
-            <video src={item.reel.video_url ?? undefined} poster={item.reel.thumbnail_url ?? undefined} muted playsInline controls preload="metadata" className="absolute inset-0 h-full w-full object-contain" onEnded={() => setEndedFlag(item.reel.id)} />
+            <video src={item.reel.video_url ?? undefined} poster={item.reel.thumbnail_url ?? undefined} muted playsInline controls preload="metadata" className="absolute inset-0 h-full w-full object-contain" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background via-background/70 to-transparent" />
             {burst === item.reel.id && <span role="status" className="fire-burst pointer-events-none absolute inset-0 m-auto grid h-28 w-28 place-items-center text-6xl">🔥</span>}
 
@@ -244,8 +244,4 @@ function ReelsPage() {
       <ActionDialog title={notice?.title ?? null} description={notice?.text} onClose={() => setNotice(null)} />
     </div>
   );
-
-  function setEndedFlag(id: string) {
-    setEnded(value => ({ ...value, [id]: true }));
-  }
 }

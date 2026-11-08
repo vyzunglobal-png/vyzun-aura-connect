@@ -63,22 +63,6 @@ export const AuraCardView = forwardRef<
           <div className="chamfer-inner relative flex h-full w-full flex-col bg-background px-5 py-5">
             <div className="pointer-events-none absolute inset-0 bg-gradient-vyzun opacity-20" />
             <div className="pointer-events-none absolute -top-16 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-violet/30 blur-3xl" />
-            {/* holographic shine sweep + floating cosmic dust */}
-            <div aria-hidden className="aura-shine pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
-            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-              {Array.from({ length: 14 }, (_, i) => (
-                <span
-                  key={i}
-                  className="aura-dust absolute h-[3px] w-[3px] rounded-full bg-cyan"
-                  style={{
-                    left: `${(i * 37 + 11) % 94}%`,
-                    top: `${(i * 53 + 7) % 92}%`,
-                    animationDelay: `${(i % 7) * 0.7}s`,
-                    boxShadow: "0 0 6px var(--color-cyan)",
-                  }}
-                />
-              ))}
-            </div>
 
             <header className="relative flex items-center justify-between">
               <div><p className="text-xs font-medium">@{username}</p><p className="text-[9px] uppercase text-muted-foreground">24-hour live vibe</p></div>
@@ -119,12 +103,8 @@ export const AuraCardView = forwardRef<
               <p className="text-[10px] text-muted-foreground">Top {card.percentile}% aura percentile · entertainment reading</p>
             </div>
 
-            <div className="relative mt-3 grid grid-cols-4 gap-1.5">
-              {GAUGES.map((g, i) => (
-                <div key={g.label} className="rounded-xl border border-glass-border bg-foreground/5 py-1.5 shadow-[0_6px_16px_-8px_rgba(0,0,0,0.8)] backdrop-blur-md">
-                  <Gauge label={g.label} color={g.color} value={seeded(card.id, i, card.score)} />
-                </div>
-              ))}
+            <div className="relative mt-3 grid grid-cols-4 gap-1">
+              {GAUGES.map((g, i) => <Gauge key={g.label} label={g.label} color={g.color} value={seeded(card.id, i, card.score)} />)}
             </div>
 
             <div className="relative mt-3 flex items-center justify-center gap-2">

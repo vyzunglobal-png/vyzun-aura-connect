@@ -50,4 +50,3 @@ Store approval, complete privacy compliance and production safety certification 
 - [ ] Direct Chats button to top-right of Secrets header; Scan tab keeps only $4.99 reveal CTA ($2.99 Boost to aura overlay, $1.99 Pass to Campus Map); Profile banners (Platinum Pass, Creator Dashboard) into Settings drawer; Trophy Cabinet horizontal row.
 - [ ] 3D cut-corner holographic Aura Card: 45° chamfered corners, double neon purple/cyan border, glowing ring portrait, ULTRA RARE crown, 4 stat gauges, aura orbs, AI quote, SHARE/SAVE buttons.
 - [ ] Embed vyzun.global@gmail.com in Profile Settings, Help, Privacy footers.
-- [ ] Living 3D Aura engine: midnight-regenerated daily vibe card, morning notification prompt, Aura Flame streak (daily check+share), rotating campus mood prompt, full-screen 9:16 chamfered neon/gold holographic modal with particles + glassmorphic stats, SHARE TO STORY row with "Beat my Aura ➔ VYZUN".

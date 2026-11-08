@@ -391,3 +391,10 @@
 .voice-wave:nth-child(3n + 1) { animation-delay: -500ms; }
 @keyframes vz-voice-wave { from { transform: scaleY(.3); } to { transform: scaleY(1.4); } }
 @media (prefers-reduced-motion: reduce) { .fire-burst, .profile-squircle, .voice-wave { animation: none; } }
+
+/* Living Aura: holographic shine sweep + floating cosmic dust */
+@keyframes vz-shine { 0% { transform: translateX(-140%) skewX(-18deg); } 60%, 100% { transform: translateX(340%) skewX(-18deg); } }
+@keyframes vz-dust { 0%, 100% { transform: translateY(0); opacity: .25; } 50% { transform: translateY(-22px); opacity: .9; } }
+.aura-shine { animation: vz-shine 6s ease-in-out infinite; }
+.aura-dust { animation: vz-dust 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .aura-shine, .aura-dust { animation: none; } }

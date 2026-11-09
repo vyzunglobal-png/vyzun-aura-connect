@@ -52,5 +52,6 @@ Store approval, complete privacy compliance and production safety certification 
 - [ ] Embed vyzun.global@gmail.com in Profile Settings, Help, Privacy footers.
 
 ## Latest requests
+- [ ] Nov 9 Reels: polish neon header, Chokotha aura portraits and large solid engagement icons; expose separate share and download choices; verify desktop and phone.
 - [ ] Living Aura: activity-based midnight evolution, morning notification, consecutive check/share streak, daily prompt, full-screen 9:16 chamfered neon card and story export. Actual story posting must not be claimed without platform confirmation.
 - [x] Secrets link: prominent side-by-side frosted Copy Link and glowing purple-pink Share Link pills below the URL; checked at 384px phone width.

@@ -19,6 +19,7 @@
 - Use secretDropLink for recipient URLs and route them through /ask/$username; share destinations must remain functional without a custom domain.
 - Reuse MessagesView in the full-screen messages route and chat sheet; never fabricate threads, delivery, calls, matches or campus totals when services are unavailable.
 - Reels use useReelFeed for approved published media; never replace unavailable inventory with fictional creators or engagement counts.
+- Keep Reels presentation colors and glow effects in global semantic tokens, and expose share and download as distinct choices so native sharing never hides saving.
 - ChatComposer keeps attachments and recordings as ephemeral local previews until authenticated encrypted and moderated delivery is activated; never persist raw media drafts or claim delivery.
 - Reuse ActionDialog for contextual unavailable-action states so inactive services never produce false rewards or results.
 - Keep AI provider helpers server-only and invoke the authenticated companion function with explicit creative context; AI never receives private chat history implicitly.

@@ -50,3 +50,7 @@ Store approval, complete privacy compliance and production safety certification 
 - [ ] Direct Chats button to top-right of Secrets header; Scan tab keeps only $4.99 reveal CTA ($2.99 Boost to aura overlay, $1.99 Pass to Campus Map); Profile banners (Platinum Pass, Creator Dashboard) into Settings drawer; Trophy Cabinet horizontal row.
 - [ ] 3D cut-corner holographic Aura Card: 45° chamfered corners, double neon purple/cyan border, glowing ring portrait, ULTRA RARE crown, 4 stat gauges, aura orbs, AI quote, SHARE/SAVE buttons.
 - [ ] Embed vyzun.global@gmail.com in Profile Settings, Help, Privacy footers.
+
+## Latest requests
+- [ ] Living Aura: activity-based midnight evolution, morning notification, consecutive check/share streak, daily prompt, full-screen 9:16 chamfered neon card and story export. Actual story posting must not be claimed without platform confirmation.
+- [ ] Secrets link: replace corner icons with prominent side-by-side Copy Link (frosted) and Share Link (purple-pink glow) pill buttons below the anonymous URL.

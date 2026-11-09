@@ -53,4 +53,4 @@ Store approval, complete privacy compliance and production safety certification 
 
 ## Latest requests
 - [ ] Living Aura: activity-based midnight evolution, morning notification, consecutive check/share streak, daily prompt, full-screen 9:16 chamfered neon card and story export. Actual story posting must not be claimed without platform confirmation.
-- [ ] Secrets link: replace corner icons with prominent side-by-side Copy Link (frosted) and Share Link (purple-pink glow) pill buttons below the anonymous URL.
+- [x] Secrets link: prominent side-by-side frosted Copy Link and glowing purple-pink Share Link pills below the URL; checked at 384px phone width.

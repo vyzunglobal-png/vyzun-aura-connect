@@ -98,6 +98,15 @@
   --link-frost-foreground: oklch(0.23 0.04 280);
   --link-frost-hover: oklch(0.99 0.008 280);
   --link-share-glow: 0 0 22px -5px color-mix(in oklab, var(--vz-magenta) 70%, transparent);
+  --reel-background: oklch(0.12 0.035 280);
+  --reel-foreground: oklch(0.99 0.005 280);
+  --reel-surface: oklch(0.16 0.04 280 / 88%);
+  --reel-blue: oklch(0.75 0.17 230);
+  --reel-violet: oklch(0.7 0.25 295);
+  --reel-cosmic: radial-gradient(ellipse at 15% 12%, color-mix(in oklab, var(--vz-violet) 32%, transparent), transparent 62%), radial-gradient(ellipse at 90% 80%, color-mix(in oklab, var(--reel-blue) 22%, transparent), transparent 65%);
+  --reel-border: linear-gradient(110deg, var(--vz-cyan), var(--reel-violet) 45%, var(--vz-magenta));
+  --reel-glow: 0 0 12px color-mix(in oklab, var(--vz-magenta) 45%, transparent), 0 0 26px color-mix(in oklab, var(--reel-violet) 35%, transparent);
+  --reel-text-shadow: 0 2px 5px var(--reel-background);
 }
 
 .theme-light {
@@ -185,6 +194,41 @@
 }
 .secret-link-share:hover { filter: brightness(1.12); box-shadow: var(--link-share-glow), var(--glow-neon); }
 .secret-link-action:active { transform: scale(0.98); }
+.reels-stage { background: var(--reel-background); color: var(--reel-foreground); }
+.reels-cosmos { background-image: var(--reel-cosmic); }
+.reels-header { padding-top: max(12px, env(safe-area-inset-top)); background: linear-gradient(var(--reel-background), transparent); }
+.reel-category {
+  height: 36px; padding: 0 12px; border: 1.5px solid transparent; border-radius: 999px;
+  background: linear-gradient(var(--reel-surface), var(--reel-surface)) padding-box, var(--reel-border) border-box;
+  color: var(--reel-foreground); box-shadow: var(--reel-glow); font-size: 12px; font-weight: 700;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+.reel-category[aria-pressed="false"] { box-shadow: none; opacity: .82; }
+.reel-category:hover { filter: brightness(1.2); background: linear-gradient(var(--reel-surface), var(--reel-surface)) padding-box, var(--reel-border) border-box; color: var(--reel-foreground); }
+.reel-create, .reel-vibe { background-image: var(--gradient-secret); color: var(--primary-foreground); box-shadow: var(--reel-glow); }
+.reel-create:hover, .reel-vibe:hover { filter: brightness(1.18); }
+.reel-portrait { padding: 2px; border-radius: 30%; background-image: var(--reel-border); box-shadow: var(--reel-glow), var(--glow-cyan); }
+.reel-portrait-inner { display: grid; width: 100%; height: 100%; place-items: center; overflow: hidden; border-radius: 28%; background: var(--reel-surface); }
+.reel-action { color: var(--reel-foreground); width: 48px; height: 48px; border-radius: 50%; }
+.reel-action:hover { background: var(--glass); color: inherit; }
+.reel-action svg { width: 32px; height: 32px; stroke-width: 2.5; filter: drop-shadow(0 0 9px currentColor); }
+.reel-action-heart { color: var(--reel-foreground); }
+.reel-action-heart[aria-pressed="true"] { color: var(--destructive); }
+.reel-action-fire { color: var(--vz-gold); }
+.reel-action-comment { color: var(--reel-blue); }
+.reel-action-clash { color: var(--reel-violet); }
+.reel-action-share { color: var(--vz-cyan); }
+.reel-count { color: var(--reel-foreground); font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; text-shadow: var(--reel-text-shadow); }
+.reel-caption { text-shadow: var(--reel-text-shadow); overflow-wrap: anywhere; }
+.reel-scrim { background: linear-gradient(transparent, color-mix(in oklab, var(--reel-background) 65%, transparent) 45%, var(--reel-background)); }
+.reel-search { color: var(--reel-foreground); filter: drop-shadow(0 0 7px var(--vz-cyan)); }
+@media (max-width: 380px) {
+  .reels-header { gap: 4px; padding-left: 8px; padding-right: 8px; }
+  .reel-category { padding: 0 8px; font-size: 11px; }
+  .reel-category svg { width: 12px; height: 12px; }
+  .reel-vibe { padding-left: 8px; padding-right: 8px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .reel-category { transition: none; } }
 @media (prefers-reduced-motion: reduce) { .secret-link-action { transition: none; } }
 @utility text-gradient-secret { background-image: var(--gradient-secret); background-clip: text; color: transparent; }
 

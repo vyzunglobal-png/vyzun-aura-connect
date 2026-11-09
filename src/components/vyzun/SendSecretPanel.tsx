@@ -51,17 +51,19 @@ export function SendSecretPanel({ username, initialTo = "" }: { username: string
 
   return (
     <div className="space-y-3">
-      <div className="glass-card flex items-center gap-3 p-3">
-        <div className="min-w-0 flex-1">
+      <div className="glass-card space-y-4 p-4">
+        <div className="min-w-0 space-y-1">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Your anonymous link</p>
           <p className="text-gradient-secret truncate text-sm font-bold" title={link}>vyzun.app/ask/@{handle}</p>
         </div>
-        <Button variant="outline" size="icon" onClick={copy} disabled={!origin} aria-label="Copy link" className="squircle h-10 w-10 shrink-0 border-magenta/60 text-magenta shadow-[var(--glow-neon)]">
-          <Copy className="h-4 w-4" />
-        </Button>
-        <Button size="icon" onClick={share} disabled={!origin} aria-label="Share link" className="bg-gradient-secret squircle h-10 w-10 shrink-0 text-primary-foreground shadow-[var(--glow-neon)]">
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="linkCopy" onClick={copy} disabled={!origin}>
+            <Copy /> Copy Link
+          </Button>
+          <Button variant="linkShare" onClick={share} disabled={!origin}>
+            <Share2 /> Share Link
+          </Button>
+        </div>
       </div>
 
       <div className="glass-card p-4">

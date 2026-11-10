@@ -1,134 +1,182 @@
-import { forwardRef, useEffect, useState } from "react";
-import { BadgeCheck, Crown, Sparkles } from "lucide-react";
+import { forwardRef, useEffect, useRef, type CSSProperties } from "react";
+import { BadgeCheck, Crown, Link2, MessageCircleHeart, ScanFace } from "lucide-react";
 import type { AuraCard } from "@/lib/vyzun-store";
-import { getDailyAura } from "@/lib/aura-daily";
+import type { LiveVibe } from "@/lib/aura-daily";
+import { DEFAULT_PALETTE, type AuraColor } from "@/lib/aura-palette";
+import { AuraParticles } from "./AuraParticles";
 import { Logo, Wordmark } from "./Logo";
 import { cn } from "@/lib/utils";
 
 const GAUGES = [
-  { label: "Creativity", color: "var(--color-violet)" },
-  { label: "Emotional Depth", color: "var(--color-cyan)" },
-  { label: "Confidence", color: "var(--color-magenta)" },
-  { label: "Positive Energy", color: "var(--color-emerald)" },
-];
-const PALETTE = ["var(--color-violet)", "var(--color-cyan)", "var(--color-magenta)", "var(--color-gold)"];
+  { key: "creativity", label: "Creativity", color: "var(--aura-violet)" },
+  { key: "depth", label: "Depth", color: "var(--aura-aqua)" },
+  { key: "confidence", label: "Confidence", color: "var(--aura-rose)" },
+  { key: "energy", label: "Energy", color: "var(--aura-gold)" },
+] as const;
 
-/** Stable per-card variation so each gauge differs but never changes on re-render. */
-function seeded(id: string, i: number, score: number) {
-  let h = 0;
-  for (const ch of id + i) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return Math.max(40, Math.min(99, score - 12 + (h % 24)));
+export function rarityFor(score: number) {
+  if (score >= 95) return "Mythic";
+  if (score >= 88) return "Legendary";
+  if (score >= 70) return "Epic";
+  if (score >= 50) return "Rare";
+  return "Common";
 }
 
 function Gauge({ value, label, color }: { value: number; label: string; color: string }) {
-  const r = 18;
+  const r = 17;
   const c = 2 * Math.PI * r;
   return (
-    <div className="flex flex-col items-center gap-1">
-      <svg viewBox="0 0 44 44" className="h-12 w-12 -rotate-90" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
-        <circle cx="22" cy="22" r={r} fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="4" />
-        <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} />
-        <text x="22" y="26" textAnchor="middle" className="fill-foreground text-[11px] font-bold" transform="rotate(90 22 22)">{value}</text>
-      </svg>
-      <span className="text-center text-[9px] leading-tight text-muted-foreground">{label}</span>
+    <div className="aura-glass flex flex-col items-center gap-[1.6cqw] rounded-[4cqw] px-[1cqw] py-[2.6cqw]">
+      <div className="relative h-[13.5cqw] w-[13.5cqw]">
+        <svg viewBox="0 0 44 44" className="h-full w-full -rotate-90" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+          <circle cx="22" cy="22" r={r} fill="none" stroke="currentColor" strokeOpacity="0.14" strokeWidth="4.5" />
+          <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="4.5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} />
+        </svg>
+        <span className="absolute inset-0 grid place-items-center font-display text-[4.6cqw] font-bold">{value}</span>
+      </div>
+      <span className="text-[2.7cqw] font-semibold uppercase tracking-[0.06em] text-muted-foreground">{label}</span>
     </div>
   );
 }
 
-export const AuraCardView = forwardRef<
-  HTMLElement,
-  { card: AuraCard; username: string; prime?: boolean; streak?: number; className?: string }
->(function AuraCardView({ card, username, prime, streak = 0, className }, ref) {
-  const ultra = card.rarity === "Legendary" || card.rarity === "Mythic";
-  const quote = card.lines[0] ?? card.headline;
-  const [daily, setDaily] = useState({ score: card.score, prompt: "What small win deserves a little more credit today?" });
+type Props = {
+  card: AuraCard;
+  username: string;
+  live: LiveVibe;
+  palette?: AuraColor[];
+  prime?: boolean;
+  streak?: number;
+  /** Story export: no tilt/animation, and an Instagram-style link sticker. */
+  still?: boolean;
+  sticker?: string;
+  className?: string;
+};
 
+export const AuraCardView = forwardRef<HTMLElement, Props>(function AuraCardView(
+  { card, username, live, palette = DEFAULT_PALETTE, prime, streak = 0, still = false, sticker, className },
+  ref,
+) {
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const rarity = rarityFor(live.score);
+  const ultra = rarity === "Legendary" || rarity === "Mythic";
+  const quote = card.lines[0] ?? card.headline;
+  const ring = Object.fromEntries(palette.slice(0, 4).map((p, i) => [`--p${i + 1}`, p.token])) as CSSProperties;
+
+  // Pointer tilt-parallax with eased motion; idle sway is CSS.
   useEffect(() => {
-    const refresh = () => {
-      const now = new Date();
-      const day = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-      setDaily(getDailyAura(card.id, card.score, day));
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 100);
-      return window.setTimeout(refresh, Math.max(1000, midnight.getTime() - now.getTime()));
+    const el = tiltRef.current;
+    if (!el || still || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0, tx = 0, ty = 0, cx = 0, cy = 0, mx = 50, my = 28, tmx = 50, tmy = 28;
+    const loop = () => {
+      cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12; mx += (tmx - mx) * 0.12; my += (tmy - my) * 0.12;
+      el.style.transform = `perspective(1100px) rotateX(${cy.toFixed(2)}deg) rotateY(${cx.toFixed(2)}deg)`;
+      el.style.setProperty("--mx", `${mx.toFixed(1)}%`);
+      el.style.setProperty("--my", `${my.toFixed(1)}%`);
+      raf = Math.abs(tx - cx) + Math.abs(ty - cy) + Math.abs(tmx - mx) > 0.05 ? requestAnimationFrame(loop) : 0;
     };
-    const timer = refresh();
-    return () => window.clearTimeout(timer);
-  }, [card.id, card.score]);
+    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      tx = (px - 0.5) * 14; ty = (0.5 - py) * 12; tmx = px * 100; tmy = py * 100; kick();
+    };
+    const leave = () => { tx = 0; ty = 0; tmx = 50; tmy = 28; kick(); };
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerleave", leave);
+    el.addEventListener("pointercancel", leave);
+    return () => { cancelAnimationFrame(raf); el.removeEventListener("pointermove", move); el.removeEventListener("pointerleave", leave); el.removeEventListener("pointercancel", leave); };
+  }, [still]);
 
   return (
-    <article ref={ref} className={cn("chamfer relative mt-4 aspect-[9/16] w-full bg-gradient-to-br from-violet via-cyan to-violet p-[2px]", className)}>
-      <div className="chamfer-inner h-full w-full bg-background p-[3px]">
-        <div className="chamfer-inner relative h-full w-full overflow-hidden bg-gradient-to-br from-cyan/60 via-violet/40 to-cyan/60 p-[1px]">
-          <div className="chamfer-inner relative flex h-full w-full flex-col bg-background px-5 py-5">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-vyzun opacity-20" />
-            <div className="pointer-events-none absolute -top-16 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-violet/30 blur-3xl" />
+    <div className={cn("aura-scope relative", !still && "aura-sway", className)}>
+      <div ref={tiltRef} className="aura-tilt relative">
+        {/* static bloom behind the frame (blur computed once) */}
+        {!still && <div aria-hidden className="aura-bloom aura-cut absolute -inset-1 [--cut:30px]" />}
+        <article ref={ref} aria-label={`Aura Card for @${username}`} className="aura-line aura-cut relative aspect-[9/16] w-full p-[2px] [--cut:30px]">
+          <div className="aura-gap aura-cut h-full w-full p-[5px] [--cut:29px]">
+            <div className="aura-line-alt aura-cut h-full w-full p-[1.5px] [--cut:27px]">
+              <div className="aura-body aura-cut relative flex h-full w-full flex-col overflow-hidden px-[5.5cqw] pb-[4.5cqw] pt-[5cqw] [--cut:26px]">
+                <div aria-hidden className="aura-halo -top-[18%] left-[12%] h-[40%] w-[76%] bg-violet/35" />
+                <div aria-hidden className="aura-halo bottom-[8%] -right-[20%] h-[34%] w-[60%] bg-cyan/15 [animation-delay:-4s]" />
+                <div aria-hidden className="aura-halo bottom-[30%] -left-[25%] h-[28%] w-[50%] bg-magenta/15 [animation-delay:-7s]" />
+                <AuraParticles still={still} />
+                <div aria-hidden className="aura-shine" />
 
-            <header className="relative flex items-center justify-between">
-              <div><p className="text-xs font-medium">@{username}</p><p className="text-[9px] uppercase text-muted-foreground">24-hour live vibe</p></div>
-              {prime && (
-                <span className="flex items-center gap-1 rounded-full bg-gradient-vyzun px-2 py-0.5 text-[9px] font-semibold text-primary-foreground">
-                  <BadgeCheck className="h-3 w-3" /> PRIME
-                </span>
-              )}
-            </header>
+                <header className="relative flex items-center justify-between">
+                  <p className="flex items-center gap-[1.4cqw] text-[4.2cqw] font-semibold">
+                    @{username}
+                    {prime && <BadgeCheck className="h-[4.2cqw] w-[4.2cqw] text-cyan" aria-label="Prime" />}
+                  </p>
+                  <span className="aura-flame flex items-center gap-[1cqw] rounded-full px-[2.8cqw] py-[1cqw] text-[4cqw] font-bold" aria-label={`Aura Flame streak ${streak} days`}>
+                    <span aria-hidden className="aura-flame-icon inline-block">🔥</span>{streak}
+                  </span>
+                </header>
 
-            {/* crown + cosmic ring portrait */}
-            <div className="relative mx-auto mt-3 flex flex-col items-center">
-              <span className="z-10 -mb-3 flex items-center gap-1 rounded-full border border-gold/70 bg-background px-2.5 py-0.5 text-[9px] font-bold tracking-[0.2em] text-gold shadow-[0_0_14px_var(--color-gold)]">
-                <Crown className="h-3 w-3" /> {ultra ? "ULTRA RARE" : card.rarity.toUpperCase()}
-              </span>
-              <div className="relative h-32 w-32">
-                <div className="anim-spin-slow absolute -inset-2 rounded-full bg-[conic-gradient(var(--color-violet),var(--color-cyan),var(--color-magenta),var(--color-gold),var(--color-violet))] opacity-90 blur-[3px]" />
-                {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className="anim-pulse-neon absolute h-1 w-1 rounded-full bg-cyan" style={{ top: `${50 + 56 * Math.sin(i)}%`, left: `${50 + 56 * Math.cos(i)}%` }} />
-                ))}
-                <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-background">
-                  {card.photo ? (
-                    <img src={card.photo} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="grid h-full w-full place-items-center bg-background">
-                      <Sparkles className="h-10 w-10 text-cyan" />
+                {/* cosmic energy ring portrait */}
+                <div className="relative mx-auto mt-[3cqw] flex flex-col items-center">
+                  <span className="aura-crown relative z-20 -mb-[2.6cqw] flex items-center gap-[1.2cqw] rounded-full px-[3cqw] py-[0.8cqw] text-[3cqw] font-bold tracking-[0.22em]">
+                    <Crown className="h-[3.4cqw] w-[3.4cqw] fill-current" /> {ultra ? "ULTRA RARE" : rarity.toUpperCase()}
+                  </span>
+                  <div className="relative h-[38cqw] w-[38cqw]" style={ring}>
+                    <div aria-hidden className="aura-ring-bloom anim-spin-slow absolute -inset-[3cqw] rounded-full" />
+                    <div aria-hidden className="aura-ring anim-spin-slow absolute -inset-[1.6cqw] rounded-full" />
+                    <div aria-hidden className="aura-orbit absolute -inset-[4.5cqw]">
+                      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                        <span key={i} className="anim-pulse-neon absolute h-[1.3cqw] w-[1.3cqw] rounded-full bg-cyan shadow-[var(--glow-cyan)]" style={{ top: `${50 - 50 * Math.cos((i * 2 * Math.PI) / 7)}%`, left: `${50 + 50 * Math.sin((i * 2 * Math.PI) / 7)}%`, animationDelay: `${-i * 0.4}s` }} />
+                      ))}
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-vyzun opacity-20 mix-blend-screen" />
+                    <div className="aura-portrait relative h-full w-full overflow-hidden rounded-full">
+                      {card.photo ? (
+                        <img src={card.photo} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="grid h-full w-full place-items-center"><ScanFace strokeWidth={1.6} className="h-[15cqw] w-[15cqw] text-cyan drop-shadow-[0_0_8px_var(--color-cyan)]" /></div>
+                      )}
+                      <div aria-hidden className="absolute inset-0 rounded-full bg-gradient-to-b from-violet/10 via-transparent to-magenta/20 mix-blend-screen" />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="relative mt-[4cqw] text-center">
+                  <p className="aura-score font-display text-[17cqw] font-bold leading-[0.95]">{live.score}%</p>
+                  <p className="aura-headline mt-[1cqw] font-display text-[7.4cqw] font-bold leading-tight">{card.headline}</p>
+                  <p className="mt-[1.2cqw] text-[3.3cqw] text-muted-foreground">24-Hour Live Vibe · Top {Math.max(1, 100 - live.score)}% · entertainment reading</p>
+                </div>
+
+                <div className="relative mt-[3.4cqw] grid grid-cols-4 gap-[2cqw]">
+                  {GAUGES.map((g) => <Gauge key={g.key} label={g.label} color={g.color} value={live.stats[g.key]} />)}
+                </div>
+
+                <div className="relative mt-[3cqw] flex items-center justify-center gap-[2.4cqw]">
+                  <span className="mr-[1cqw] text-[3cqw] font-medium uppercase tracking-[0.2em] text-muted-foreground">Aura Palette</span>
+                  {palette.slice(0, 4).map((c) => (
+                    <span key={c.name} title={c.name} className="aura-orb h-[7cqw] w-[7cqw] rounded-full" style={{ "--orb": c.token } as CSSProperties} />
+                  ))}
+                </div>
+                <p className="relative mt-[1cqw] text-center text-[2.7cqw] tracking-wide text-muted-foreground">{palette.slice(0, 3).map((c) => c.name).join(" · ")}</p>
+
+                <blockquote className="aura-glass relative mt-[2.6cqw] rounded-full px-[4cqw] py-[2.2cqw] text-center text-[4cqw] italic leading-snug">“{quote}”</blockquote>
+                <div className="aura-mood relative mt-[2.4cqw] flex items-center gap-[2.6cqw] rounded-[5cqw] px-[3.6cqw] py-[2.4cqw]">
+                  <MessageCircleHeart className="h-[6cqw] w-[6cqw] shrink-0 text-magenta" />
+                  <p className="text-[3.7cqw] leading-snug"><span className="font-semibold text-magenta">Campus Mood</span> · {live.prompt}</p>
+                </div>
+
+                {sticker && (
+                  <div className="aura-sticker relative mx-auto mt-auto flex items-center gap-[1.6cqw] rounded-[3cqw] px-[3.4cqw] py-[1.8cqw] text-[3.5cqw] font-bold">
+                    <Link2 className="h-[4cqw] w-[4cqw] text-violet" /> <span className="max-w-[60cqw] truncate">{sticker}</span>
+                  </div>
+                )}
+                <footer className={cn("relative flex items-center justify-between", sticker ? "mt-[2.4cqw]" : "mt-auto")}>
+                  <span className="text-[4.4cqw] font-semibold">Beat my Aura ➔ <span className="aura-brand">VYZUN</span></span>
+                  <span className="flex items-center gap-[1.6cqw]">
+                    <Logo className="h-[6.6cqw] w-[6.6cqw]" />
+                    <Wordmark className="text-[5.2cqw]" />
+                  </span>
+                </footer>
               </div>
             </div>
-
-            <div className="relative mt-3 text-center">
-              <p className="font-display text-5xl font-bold leading-none">{daily.score}%</p>
-              <p className="text-gradient font-display text-xl font-semibold">{card.headline}</p>
-              <p className="mt-1 inline-flex items-center gap-1 rounded-full border border-gold/40 bg-background/50 px-2 py-1 text-[10px] font-semibold text-gold"><span aria-hidden>🔥</span> {streak} day{streak === 1 ? "" : "s"} · share streak</p>
-              <p className="text-[10px] text-muted-foreground">Top {card.percentile}% aura percentile · entertainment reading</p>
-            </div>
-
-            <div className="relative mt-3 grid grid-cols-4 gap-1">
-              {GAUGES.map((g, i) => <Gauge key={g.label} label={g.label} color={g.color} value={seeded(card.id, i, card.score)} />)}
-            </div>
-
-            <div className="relative mt-3 flex items-center justify-center gap-2">
-              <span className="text-[9px] uppercase tracking-widest text-muted-foreground">Aura Palette</span>
-              {PALETTE.map((c) => (
-                <span key={c} className="h-5 w-5 rounded-full" style={{ background: `radial-gradient(circle at 30% 30%, white, ${c} 45%)`, boxShadow: `0 0 10px ${c}` }} />
-              ))}
-            </div>
-
-            <div className="relative mt-3 space-y-2">
-              <blockquote className="rounded-xl border border-glass-border bg-foreground/5 px-3 py-2 text-center text-[12px] italic leading-snug backdrop-blur-md">“{quote}”</blockquote>
-              <p className="rounded-xl border border-cyan/25 bg-background/40 px-3 py-2 text-center text-[10px] leading-snug"><span className="mb-1 block font-semibold text-cyan">CAMPUS MOOD PROMPT</span>{daily.prompt}</p>
-            </div>
-
-            <footer className="relative mt-auto flex items-center justify-between pt-3">
-              <span className="text-xs font-semibold">Beat my Aura ➔ VYZUN</span>
-              <span className="flex items-center gap-1.5">
-                <Logo className="h-5 w-5" />
-                <Wordmark className="text-sm" />
-              </span>
-            </footer>
           </div>
-        </div>
+        </article>
       </div>
-    </article>
+    </div>
   );
 });

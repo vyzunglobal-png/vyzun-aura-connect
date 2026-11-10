@@ -461,3 +461,142 @@
 .voice-wave:nth-child(3n + 1) { animation-delay: -500ms; }
 @keyframes vz-voice-wave { from { transform: scaleY(.3); } to { transform: scaleY(1.4); } }
 @media (prefers-reduced-motion: reduce) { .fire-burst, .profile-squircle, .voice-wave { animation: none; } }
+
+/* ------------------------------------------------------------------ *
+ * Living 3D Aura Card — luxury holographic tokens (theme-independent)
+ * ------------------------------------------------------------------ */
+:root {
+  --aura-violet: oklch(0.63 0.27 296);
+  --aura-aqua: oklch(0.88 0.16 200);
+  --aura-rose: oklch(0.72 0.29 336);
+  --aura-gold: oklch(0.86 0.16 84);
+  --aura-coral: oklch(0.74 0.19 32);
+  --aura-jade: oklch(0.82 0.17 160);
+  --aura-sapphire: oklch(0.7 0.17 252);
+  --aura-shine: oklch(1 0 0);
+  --aura-void: oklch(0.1 0.04 282);
+  --aura-ink: oklch(0.16 0.05 280);
+  --aura-shadow-deep: oklch(0.04 0.03 280 / 75%);
+  --aura-glass-top: oklch(1 0 0 / 11%);
+  --aura-glass-bottom: oklch(1 0 0 / 3%);
+  --aura-glass-edge: oklch(1 0 0 / 14%);
+  --aura-sticker: oklch(0.99 0.005 280);
+  --aura-sticker-ink: oklch(0.2 0.06 285);
+  --aura-line: conic-gradient(from var(--aura-angle), var(--aura-violet), var(--aura-sapphire), var(--aura-aqua), var(--aura-jade) 30%, var(--aura-gold) 45%, var(--aura-coral), var(--aura-rose) 70%, var(--aura-violet));
+  --aura-bloom: conic-gradient(from 200deg, var(--aura-violet), var(--aura-aqua), var(--aura-gold), var(--aura-rose), var(--aura-violet));
+  --aura-cosmos: radial-gradient(120% 55% at 50% 0%, color-mix(in oklab, var(--aura-violet) 42%, transparent), transparent 62%),
+    radial-gradient(90% 50% at 100% 100%, color-mix(in oklab, var(--aura-sapphire) 32%, transparent), transparent 70%),
+    radial-gradient(70% 45% at 0% 72%, color-mix(in oklab, var(--aura-rose) 18%, transparent), transparent 70%),
+    linear-gradient(172deg, oklch(0.21 0.08 287), oklch(0.13 0.045 272) 58%, oklch(0.15 0.055 256));
+}
+
+/* Forces the dark cosmic palette inside the card and its overlay, in either app theme. */
+.aura-scope {
+  --background: oklch(0.12 0.035 276);
+  --foreground: oklch(0.98 0.008 280);
+  --card: oklch(0.18 0.04 275);
+  --muted-foreground: oklch(0.76 0.03 282);
+  --border: oklch(0.9 0.08 300 / 18%);
+  --glass-border: oklch(0.9 0.08 300 / 20%);
+  --glass: oklch(0.99 0.01 280 / 6%);
+  color: var(--foreground);
+}
+.aura-overlay {
+  background: radial-gradient(80% 50% at 50% 0%, color-mix(in oklab, var(--aura-violet) 22%, transparent), transparent 70%), var(--aura-void);
+}
+
+@property --aura-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes aura-angle-spin { to { --aura-angle: 360deg; } }
+
+.aura-cut {
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+}
+.aura-line { background: var(--aura-line); animation: aura-angle-spin 10s linear infinite; }
+.aura-line-alt { background: var(--aura-line); animation: aura-angle-spin 14s linear infinite reverse; }
+.aura-gap { background: var(--aura-void); }
+.aura-bloom { background: var(--aura-bloom); filter: blur(22px); opacity: 0.7; }
+.aura-body { background: var(--aura-cosmos); container-type: inline-size; }
+
+.aura-tilt { transform-style: preserve-3d; will-change: transform; }
+.aura-sway { animation: aura-sway 8s ease-in-out infinite; }
+@keyframes aura-sway {
+  0%, 100% { transform: perspective(1200px) rotateY(-2.5deg) rotateX(1deg); }
+  50% { transform: perspective(1200px) rotateY(2.5deg) rotateX(-1deg); }
+}
+
+.aura-halo { position: absolute; border-radius: 9999px; filter: blur(42px); pointer-events: none; will-change: transform; animation: aura-halo-drift 11s ease-in-out infinite alternate; }
+@keyframes aura-halo-drift { to { transform: translate3d(8%, 6%, 0) scale(1.15); } }
+
+.aura-shine {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 28%), color-mix(in oklab, var(--aura-shine) 16%, transparent), transparent 42%),
+    linear-gradient(115deg, transparent 36%, color-mix(in oklab, var(--aura-shine) 12%, transparent) 45%, color-mix(in oklab, var(--aura-aqua) 12%, transparent) 50%, color-mix(in oklab, var(--aura-rose) 10%, transparent) 55%, transparent 64%);
+  background-size: 100% 100%, 280% 280%;
+  animation: aura-shine-sweep 7s ease-in-out infinite;
+}
+@keyframes aura-shine-sweep { 0%, 100% { background-position: 0 0, 100% 0; } 50% { background-position: 0 0, 0 100%; } }
+
+.aura-ring { background: conic-gradient(var(--p1), var(--p2), var(--p3), var(--p4), var(--p1)); }
+.aura-ring-bloom { background: conic-gradient(var(--p1), var(--p2), var(--p3), var(--p4), var(--p1)); filter: blur(16px); opacity: 0.85; }
+.aura-portrait { background: radial-gradient(circle at 50% 35%, oklch(0.24 0.06 280), var(--aura-void) 75%); box-shadow: inset 0 0 24px var(--aura-shadow-deep); }
+.aura-orbit { animation: vz-spin 18s linear infinite reverse; }
+
+.aura-crown {
+  color: var(--aura-gold);
+  background: linear-gradient(180deg, oklch(0.2 0.05 70), var(--aura-void));
+  border: 1px solid color-mix(in oklab, var(--aura-gold) 70%, transparent);
+  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--aura-gold) 70%, transparent), inset 0 1px 0 color-mix(in oklab, var(--aura-gold) 40%, transparent);
+}
+.aura-flame {
+  color: var(--aura-gold);
+  background: linear-gradient(180deg, oklch(0.24 0.07 55), oklch(0.14 0.04 40));
+  border: 1px solid color-mix(in oklab, var(--aura-gold) 55%, transparent);
+  box-shadow: 0 0 16px -4px var(--aura-coral);
+}
+.aura-score { color: var(--aura-shine); text-shadow: 0 0 18px color-mix(in oklab, var(--aura-violet) 80%, transparent), 0 0 42px color-mix(in oklab, var(--aura-aqua) 30%, transparent); }
+.aura-headline {
+  background: linear-gradient(90deg, var(--aura-sapphire), var(--aura-violet) 55%, var(--aura-rose));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--aura-violet) 55%, transparent));
+}
+.aura-glass {
+  background: linear-gradient(160deg, var(--aura-glass-top), var(--aura-glass-bottom));
+  border: 1px solid var(--aura-glass-edge);
+  box-shadow: inset 0 1px 0 var(--aura-glass-edge), 0 14px 26px -12px var(--aura-shadow-deep), 0 2px 6px -2px var(--aura-shadow-deep);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+.aura-mood {
+  background: linear-gradient(120deg, color-mix(in oklab, var(--aura-rose) 16%, transparent), color-mix(in oklab, var(--aura-violet) 12%, transparent));
+  border: 1px solid color-mix(in oklab, var(--aura-rose) 40%, transparent);
+  box-shadow: 0 0 22px -10px var(--aura-rose), inset 0 1px 0 var(--aura-glass-edge);
+}
+.aura-orb { background: radial-gradient(circle at 32% 28%, var(--aura-shine), var(--orb) 42%, color-mix(in oklab, var(--orb) 55%, var(--aura-void)) 100%); box-shadow: 0 0 14px -1px var(--orb); }
+.aura-brand { color: var(--aura-violet); text-shadow: 0 0 10px color-mix(in oklab, var(--aura-violet) 60%, transparent); }
+.aura-sticker { background: var(--aura-sticker); color: var(--aura-sticker-ink); box-shadow: 0 8px 22px -8px var(--aura-shadow-deep); }
+
+.aura-cta-story {
+  background: linear-gradient(100deg, var(--aura-violet), var(--aura-rose));
+  color: var(--aura-shine);
+  box-shadow: 0 0 28px -6px color-mix(in oklab, var(--aura-rose) 75%, transparent), inset 0 1px 0 color-mix(in oklab, var(--aura-shine) 30%, transparent);
+  transition: transform 160ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+.aura-cta-story:hover { filter: brightness(1.08); box-shadow: 0 0 36px -4px color-mix(in oklab, var(--aura-rose) 85%, transparent); }
+.aura-cta-save { border: 1px solid color-mix(in oklab, var(--aura-aqua) 45%, transparent); color: var(--aura-shine); background: color-mix(in oklab, var(--aura-aqua) 6%, var(--aura-void)); box-shadow: 0 0 18px -10px var(--aura-aqua); transition: transform 160ms ease, background 200ms ease; }
+.aura-cta-save:hover { background: color-mix(in oklab, var(--aura-aqua) 14%, var(--aura-void)); }
+.aura-cta-boost { border: 1px solid color-mix(in oklab, var(--aura-violet) 70%, transparent); background: var(--aura-void); box-shadow: 0 0 22px -8px var(--aura-violet), inset 0 0 18px -12px var(--aura-rose); transition: box-shadow 200ms ease; }
+.aura-cta-boost:hover { box-shadow: 0 0 30px -6px var(--aura-violet), inset 0 0 18px -10px var(--aura-rose); }
+.aura-cta-story:active, .aura-cta-save:active, .aura-cta-boost:active { transform: scale(0.97); }
+
+.aura-banner {
+  background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(110deg, var(--aura-violet), var(--aura-rose), var(--aura-aqua)) border-box;
+  border: 1.5px solid transparent;
+  box-shadow: 0 0 26px -10px var(--aura-rose), 0 0 40px -18px var(--aura-violet);
+}
+.aura-banner-open { background: linear-gradient(100deg, var(--aura-violet), var(--aura-rose)); color: var(--aura-shine); box-shadow: 0 0 18px -4px var(--aura-rose); }
+.aura-flame-icon { filter: drop-shadow(0 0 8px var(--aura-coral)); animation: aura-flicker 1.6s ease-in-out infinite alternate; }
+@keyframes aura-flicker { to { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 12px var(--aura-gold)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-line, .aura-line-alt, .aura-sway, .aura-halo, .aura-shine, .aura-orbit, .aura-flame-icon { animation: none; }
+}

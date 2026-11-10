@@ -557,7 +557,7 @@
 .aura-score { color: var(--aura-shine); text-shadow: 0 0 18px color-mix(in oklab, var(--aura-violet) 80%, transparent), 0 0 42px color-mix(in oklab, var(--aura-aqua) 30%, transparent); }
 .aura-headline {
   background: linear-gradient(90deg, var(--aura-sapphire), var(--aura-violet) 55%, var(--aura-rose));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-clip: text; color: transparent;
   filter: drop-shadow(0 0 10px color-mix(in oklab, var(--aura-violet) 55%, transparent));
 }
 .aura-glass {

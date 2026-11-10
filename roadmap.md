@@ -32,7 +32,7 @@
 
 Store approval, complete privacy compliance and production safety certification are not established by these UI changes.
 ## UI refinement pass (Nov 5)
-- [ ] Reels: unified seamless background, remove floating REELS text, neon header, glowing engagement icons, purple-pink + Vibe With.
+- [x] Reels: unified seamless background, remove floating REELS text, neon header, glowing engagement icons, purple-pink + Vibe With.
 - [ ] Scan: Double-Blind Crush card reduced to sign-in + $4.99 reveal buttons only.
 - [ ] Secrets/Campus Map: Battle Pass card moved above Daily Clout Crown Auction; messages icon top-right; floating chats bar removed.
 - [ ] Messages: AI Signature Brand Card with logo squircle + glow ring, icebreaker pills, search, squircle DPs, PINNED badge.
@@ -40,18 +40,18 @@ Store approval, complete privacy compliance and production safety certification 
 
 ## Living Aura / Reels header update (Nov 6)
 - [ ] Aura card: dynamic daily vibe treatment, daily prompt, streak display, premium 9:16 visual polish, and story share row.
-- [ ] Reels header: remove category tabs; keep only transparent top-right Create Reel action.
+- [x] Reels header: superseded by Nov 9 request for Search, three neon category pills and round Create Reel.
 - [ ] Keep activity-based scoring, notifications, and streak increments truthful to connected data; no fabricated activity or delivery.
 
 ## New tasks (Nov 7)
-- [ ] Fix missing logo: old asset pointer referenced the previous project; generate a new VYZUN logo asset and rewire Logo.tsx.
-- [ ] Rebuild Reels tab UI: neon gradient cosmic background, glowing category pills (For You/Vibe With/Trending), search icon left, glowing + Create Reel right, squircle creator DP with neon aura ring, purple-pink + Vibe With button, bold right-side engagement sidebar (Like/Flame/Comments/Vibe Clash/Share-Save) with white counts, share-or-download action.
+- [x] Fix missing logo: restored original VYZUN logo; generated replacement rejected and removed.
+- [x] Rebuild Reels tab UI: neon cosmic background, glowing category pills, search left, round Create Reel right, squircle aura-ring DP, purple-pink Vibe With, large engagement sidebar and separate share/download choices. Real likes only; unavailable boost/comment/clash counts show a dash.
 - [ ] VYZUN AI pinned neon chat in Direct Chats with Verified Vibe Guide badge, concierge answers, CTA buttons, 3 onboarding starter chips.
 - [ ] Direct Chats button to top-right of Secrets header; Scan tab keeps only $4.99 reveal CTA ($2.99 Boost to aura overlay, $1.99 Pass to Campus Map); Profile banners (Platinum Pass, Creator Dashboard) into Settings drawer; Trophy Cabinet horizontal row.
 - [ ] 3D cut-corner holographic Aura Card: 45° chamfered corners, double neon purple/cyan border, glowing ring portrait, ULTRA RARE crown, 4 stat gauges, aura orbs, AI quote, SHARE/SAVE buttons.
 - [ ] Embed vyzun.global@gmail.com in Profile Settings, Help, Privacy footers.
 
 ## Latest requests
-- [ ] Nov 9 Reels: polish neon header, Chokotha aura portraits and large solid engagement icons; expose separate share and download choices; verify desktop and phone.
+- [x] Nov 9 Reels: neon header, Chokotha portraits and 32px engagement icons; share/download choices. Header and Create Reel verified live at 320/384/1280px; creator layout and download verified with temporary browser fixtures only. Live inventory unavailable; live-media sharing remains unverified.
 - [ ] Living Aura: activity-based midnight evolution, morning notification, consecutive check/share streak, daily prompt, full-screen 9:16 chamfered neon card and story export. Actual story posting must not be claimed without platform confirmation.
 - [x] Secrets link: prominent side-by-side frosted Copy Link and glowing purple-pink Share Link pills below the URL; checked at 384px phone width.

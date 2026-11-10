@@ -12,7 +12,6 @@ import { withSponsoredSlots } from "@/lib/reel-ad-engine";
 import { useReelFeed, type ReelCategory } from "@/lib/reel-feed";
 import { useVyzunSession } from "@/hooks/use-vyzun-session";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/reels")({
   validateSearch: (search: Record<string, unknown>): { reel?: string } => typeof search['reel'] === "string" && /^[a-f0-9-]{36}$/i.test(search['reel']) ? { reel: search['reel'] } : {},
@@ -222,7 +221,7 @@ function ReelsPage() {
                 </div>
                 <div className="flex flex-col items-center gap-0.5">
                   <Button variant="reelAction" size="icon" title="Share / Save" aria-label="Share or save Reel" onClick={() => setShareTarget({ id: item.reel.id, videoUrl: item.reel.video_url })} className="reel-action-share">
-                    <Share2 />
+                    <Share2 className="fill-current" />
                   </Button>
                   <span className="reel-count whitespace-nowrap !text-[10px]">Share / Save</span>
                 </div>

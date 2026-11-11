@@ -145,7 +145,7 @@ export function AuraCardModal({
       <div aria-hidden className="pointer-events-none fixed left-[-10000px] top-0">
         <div ref={storyRef} className="aura-scope aura-overlay relative flex h-[640px] w-[360px] flex-col items-center justify-center gap-3 px-6">
           <AuraCardView card={card} username={username} prime={state.profile.prime} live={live} palette={palette} streak={streak} still sticker={stickerText} className="w-[300px]" />
-          <p className="text-center text-[13px] font-semibold">Beat my Aura ➔ <span className="aura-brand">VYZUN</span></p>
+          <p className="whitespace-nowrap text-center text-[13px] font-semibold">Beat my Aura ➔ <span className="aura-brand">VYZUN</span></p>
         </div>
       </div>
 

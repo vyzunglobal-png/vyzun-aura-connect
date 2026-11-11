@@ -88,7 +88,7 @@ export const AuraCardView = forwardRef<HTMLElement, Props>(function AuraCardView
   }, [still]);
 
   return (
-    <div className={cn("aura-scope relative", !still && "aura-sway", className)}>
+    <div className={cn("aura-scope relative", still ? "aura-still" : "aura-sway", className)}>
       <div ref={tiltRef} className="aura-tilt relative">
         {/* static bloom behind the frame (blur computed once) */}
         {!still && <div aria-hidden className="aura-bloom aura-cut absolute -inset-1 [--cut:30px]" />}

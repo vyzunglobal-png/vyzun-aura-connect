@@ -600,3 +600,4 @@
 @media (prefers-reduced-motion: reduce) {
   .aura-line, .aura-line-alt, .aura-sway, .aura-halo, .aura-shine, .aura-orbit, .aura-flame-icon { animation: none; }
 }
+.aura-still .aura-glass { backdrop-filter: none; }

@@ -30,7 +30,7 @@ export function paletteFromHues(samples: { hue: number; weight: number }[]): Aur
     const nearest = AURA_COLORS.reduce((best, c) => (hueDistance(c.hue, s.hue) < hueDistance(best.hue, s.hue) ? c : best));
     score.set(nearest.name, (score.get(nearest.name) ?? 0) + s.weight);
   }
-  const picked = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => AURA_COLORS.find((c) => c.name === name)!);
+  const picked: AuraColor[] = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => AURA_COLORS.find((c) => c.name === name)!);
   for (const fallback of DEFAULT_PALETTE) if (!picked.some((p) => p.name === fallback.name)) picked.push(fallback);
   return picked.slice(0, 4).map(({ name, token }) => ({ name, token }));
 }

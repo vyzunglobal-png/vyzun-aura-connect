@@ -14,10 +14,7 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav
-      aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-glass-border bg-background/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
-    >
+    <nav aria-label="Primary" className="nav-glass fixed inset-x-0 bottom-0 z-40 rounded-t-3xl pb-[env(safe-area-inset-bottom)]">
       <ul className="mx-auto flex max-w-lg">
         {TABS.map(({ to, label, icon: Icon }) => {
           const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
@@ -26,20 +23,17 @@ export function BottomNav() {
               <Link
                 to={to}
                 aria-label={label}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2.5 text-[11px] tap active:tap-active",
-                  active ? "text-foreground" : "text-muted-foreground",
+                  "flex flex-col items-center gap-1 pb-2 pt-2.5 text-[12px] tap active:tap-active",
+                  active ? "text-foreground" : "text-foreground/85",
                 )}
               >
-                <span
-                  className={cn(
-                    "flex h-9 w-12 items-center justify-center rounded-xl",
-                    active && "bg-gradient-vyzun text-primary-foreground",
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
+                <span className={cn("flex h-10 w-14 items-center justify-center rounded-2xl transition-shadow", active && "nav-active-tile")}>
+                  <Icon className={cn("h-6 w-6", active && "drop-shadow-[0_0_6px_var(--color-magenta)]")} strokeWidth={2.2} />
                 </span>
-                <span className="font-medium uppercase tracking-wide">{label}</span>
+                <span className="font-bold uppercase tracking-wide">{label}</span>
+                <span aria-hidden className={cn("nav-underline w-10", !active && "invisible")} />
               </Link>
             </li>
           );

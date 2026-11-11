@@ -4,7 +4,7 @@
  */
 export type AuraColor = { name: string; token: string };
 
-export const AURA_COLORS: { name: string; token: string; hue: number }[] = [
+export const AURA_COLORS: (AuraColor & { hue: number })[] = [
   { name: "Ember Coral", token: "var(--aura-coral)", hue: 15 },
   { name: "Stellar Gold", token: "var(--aura-gold)", hue: 50 },
   { name: "Jade Pulse", token: "var(--aura-jade)", hue: 150 },
@@ -15,7 +15,7 @@ export const AURA_COLORS: { name: string; token: string; hue: number }[] = [
 ];
 
 export const DEFAULT_PALETTE: AuraColor[] = ["Mythic Violet", "Neon Aqua", "Cosmic Rose", "Stellar Gold"].map(
-  (name) => AURA_COLORS.find((c) => c.name === name)!,
+  (name) => { const { name: n, token } = AURA_COLORS.find((c) => c.name === name)!; return { name: n, token }; },
 );
 
 const hueDistance = (a: number, b: number) => {
@@ -30,7 +30,7 @@ export function paletteFromHues(samples: { hue: number; weight: number }[]): Aur
     const nearest = AURA_COLORS.reduce((best, c) => (hueDistance(c.hue, s.hue) < hueDistance(best.hue, s.hue) ? c : best));
     score.set(nearest.name, (score.get(nearest.name) ?? 0) + s.weight);
   }
-  const picked = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => AURA_COLORS.find((c) => c.name === name)!);
+  const picked: AuraColor[] = [...score.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => AURA_COLORS.find((c) => c.name === name)!);
   for (const fallback of DEFAULT_PALETTE) if (!picked.some((p) => p.name === fallback.name)) picked.push(fallback);
   return picked.slice(0, 4).map(({ name, token }) => ({ name, token }));
 }

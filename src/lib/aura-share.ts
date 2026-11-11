@@ -1,9 +1,9 @@
 import { toPng } from "html-to-image";
 
-/** Render a DOM node to a high-resolution PNG (2x) blob + data URL. */
-export async function renderNodeToPng(node: HTMLElement) {
+/** Render a DOM node to a high-resolution PNG blob + data URL (2x by default; 3x gives 1080×1920 stories). */
+export async function renderNodeToPng(node: HTMLElement, pixelRatio = 2) {
   const dataUrl = await toPng(node, {
-    pixelRatio: 2,
+    pixelRatio,
     cacheBust: true,
     // Remote font stylesheets can't be read cross-origin; skip to avoid noisy failures.
     skipFonts: true,
@@ -23,8 +23,8 @@ export function downloadDataUrl(dataUrl: string, filename: string) {
 }
 
 /** Native share with the PNG attached; falls back to download. */
-export async function shareImage(blob: Blob, dataUrl: string, text: string) {
-  const file = new File([blob], "vyzun-aura.png", { type: "image/png" });
+export async function shareImage(blob: Blob, dataUrl: string, text: string, filename = "vyzun-aura.png") {
+  const file = new File([blob], filename, { type: "image/png" });
   const nav = navigator as Navigator & {
     canShare?: (data: ShareData) => boolean;
   };
@@ -36,6 +36,6 @@ export async function shareImage(blob: Blob, dataUrl: string, text: string) {
       return "cancelled" as const;
     }
   }
-  downloadDataUrl(dataUrl, "vyzun-aura.png");
+  downloadDataUrl(dataUrl, filename);
   return "downloaded" as const;
 }

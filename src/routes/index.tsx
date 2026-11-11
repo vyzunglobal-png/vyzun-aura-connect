@@ -1,22 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Download,
-  Heart,
-  RefreshCcw,
-  Send,
-  Share2,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { Heart, Sparkles, Wand2 } from "lucide-react";
 import { AppHeader } from "@/components/vyzun/AppHeader";
-import { AuraCardView } from "@/components/vyzun/AuraCardView";
+import { AuraCardModal } from "@/components/vyzun/AuraCardModal";
+import { DailyAuraBanner } from "@/components/vyzun/DailyAuraBanner";
 import { CrushMatcher } from "@/components/vyzun/CrushMatcher";
 import { useVyzun, type AuraCard } from "@/lib/vyzun-store";
-import { downloadDataUrl, renderNodeToPng, shareImage } from "@/lib/aura-share";
 import { cn } from "@/lib/utils";
-import { recordAuraShare, type AuraStreak } from "@/lib/aura-daily";
+import { getLiveVibe } from "@/lib/aura-daily";
+import { analyzePortraitPalette, DEFAULT_PALETTE, type AuraColor } from "@/lib/aura-palette";
+import { useAuraDaily, useMorningAuraRitual } from "@/lib/use-aura-daily";
+
+/** Starter card until the first face scan; the daily engine still varies it by day and activity. */
+function baseCard(username: string): AuraCard {
+  return {
+    id: `daily-${username}`,
+    mode: "future",
+    score: 80,
+    rarity: "Epic",
+    percentile: 20,
+    headline: "Neon Main Character",
+    lines: ["Main-character lighting is on. Use it."],
+    photo: null,
+    createdAt: 0,
+  };
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -95,10 +104,6 @@ function ScanPage() {
   const [card, setCard] = useState<AuraCard | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
-  const [busy, setBusy] = useState<null | "share" | "download" | "post">(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [auraStreak, setAuraStreak] = useState<AuraStreak | null>(null);
-  const cardRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [resultOpen, setResultOpen] = useState(false);
@@ -112,12 +117,28 @@ function ScanPage() {
       if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
     };
   }, []);
+  const daily = useAuraDaily(state.profile.username);
+  const dailyCard = card ?? state.auraCards[0] ?? baseCard(state.profile.username);
+  const [palette, setPalette] = useState<AuraColor[]>(DEFAULT_PALETTE);
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(`vyzun.aura-streak.${state.profile.username}`);
-      if (saved) setAuraStreak(JSON.parse(saved) as AuraStreak);
-    } catch { /* local streak is optional */ }
-  }, [state.profile.username]);
+    let alive = true;
+    analyzePortraitPalette(dailyCard.photo).then((p) => alive && setPalette(p));
+    return () => { alive = false; };
+  }, [dailyCard.photo]);
+  const activity = useMemo(() => {
+    const since = Date.now() - 24 * 60 * 60 * 1000;
+    return {
+      scans: state.scans.filter((x) => x.createdAt >= since).length,
+      secrets: state.secrets.filter((x) => x.createdAt >= since).length,
+      posts: state.feed.filter((x) => !x.anonymous && x.author === state.profile.username && x.createdAt >= since).length,
+      sharedToday: daily.sharedToday,
+    };
+    // re-evaluated when the local day flips
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.scans, state.secrets, state.feed, state.profile.username, daily.sharedToday, daily.day]);
+  const live = useMemo(() => getLiveVibe(dailyCard.id, dailyCard.score, daily.day ?? "", activity), [dailyCard.id, dailyCard.score, daily.day, activity]);
+  const openDaily = useCallback(() => { setResultOpen(true); daily.markOpened(); }, [daily]);
+  useMorningAuraRitual(state.hydrated && state.settings.push.vibes, openDaily);
 
   async function requestCamera() {
     setCameraError(null);
@@ -156,12 +177,12 @@ function ScanPage() {
   function runScan(nextPhoto?: string | null) {
     const usePhoto = nextPhoto === undefined ? photo : nextPhoto;
     setScanning(true);
-    setNotice(null);
     scanTimerRef.current = window.setTimeout(() => {
       if (!mountedRef.current) return;
       const next = generateAura(mode, usePhoto);
       setCard(next);
       setResultOpen(true);
+      daily.markOpened();
       setScanning(false);
       update((s) => ({
         auraCards: [next, ...s.auraCards].slice(0, 30),
@@ -170,87 +191,13 @@ function ScanPage() {
     }, 1400);
   }
 
-  async function exportCard() {
-    if (!cardRef.current) return null;
-    return renderNodeToPng(cardRef.current);
-  }
-
-  async function onShare() {
-    if (!card) return;
-    setBusy("share");
-    try {
-      const out = await exportCard();
-      if (!out) return;
-      const result = await shareImage(
-        out.blob,
-        out.dataUrl,
-        `My VYZUN aura is ${card.score}% — ${card.rarity}. Beat my Aura → ${window.location.origin}/?ref=${encodeURIComponent(state.profile.username)}&aura=${encodeURIComponent(card.id)}`,
-      );
-      if (result === "shared") {
-        const now = new Date();
-        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-        const next = recordAuraShare(auraStreak, today);
-        setAuraStreak(next);
-        try { localStorage.setItem(`vyzun.aura-streak.${state.profile.username}`, JSON.stringify(next)); } catch { /* device storage may be unavailable */ }
-      }
-      if (result === "downloaded") setNotice("Sharing isn’t available here — the image was saved instead.");
-    } catch {
-      setNotice("Couldn’t create the image. Please try again.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function onDownload() {
-    setBusy("download");
-    try {
-      const out = await exportCard();
-      if (out) {
-        downloadDataUrl(out.dataUrl, "vyzun-aura.png");
-        setNotice("Aura Card image saved.");
-      }
-    } catch {
-      setNotice("Couldn’t create the image. Please try again.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function onPostToFeed() {
-    if (!card) return;
-    setBusy("post");
-    try {
-      const out = await exportCard();
-      if (!out) return;
-      update((s) => ({
-        feed: [
-          {
-            id: crypto.randomUUID(),
-            author: s.profile.username,
-            anonymous: false,
-            body: `My aura reads ${card.score} — ${card.headline}. Beat my Aura → VYZUN`,
-            image: out.dataUrl,
-            createdAt: Date.now(),
-            reactions: { vibe: 0, curious: 0, savage: 0, lol: 0 },
-            mine: null,
-          },
-          ...s.feed,
-        ],
-      }));
-      setNotice("Posted to your Vibe Feed.");
-    } catch {
-      setNotice("Couldn’t create the image. Please try again.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
   return (
     <div className="pb-28">
       <AppHeader />
 
       <main className="mx-auto max-w-lg px-5">
         <h1 className="sr-only">VYZUN AI Scanner</h1>
+        {daily.day && <DailyAuraBanner streak={daily.streakCount} prompt={live.prompt} fresh={!daily.openedToday} onOpen={openDaily} />}
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           {MODES.map(({ key, label, icon: Icon }) => (
@@ -310,60 +257,16 @@ function ScanPage() {
           ⚡ Real-Time Camera Scan Only • Gallery Upload Disabled for Accuracy
         </p>
 
-        {card && resultOpen && (
-          <div role="dialog" aria-modal="true" aria-label="Your holographic Aura Card" className="fixed inset-0 z-[60] overflow-y-auto bg-background/90 p-4 pb-24 backdrop-blur-md">
-          <section className="anim-rise mx-auto max-w-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Your Aura Card</h2>
-               <Button variant="ghost"
-                 onClick={() => setResultOpen(false)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground tap active:tap-active"
-              >
-                 Close
-               </Button>
-            </div>
-            <AuraCardView
-              ref={cardRef}
-              card={card}
-              username={state.profile.username}
-              prime={state.profile.prime}
-              streak={auraStreak?.count ?? 0}
-               className="aura-hologram"
-            />
-             <Button
-              onClick={onShare}
-              disabled={busy !== null}
-               className="mt-4 h-auto w-full whitespace-normal rounded-xl bg-gradient-vyzun py-3 font-semibold text-primary-foreground tap active:tap-active disabled:opacity-60"
-            >
-              <Share2 className="h-4 w-4" />
-                {busy === "share" ? "Preparing story…" : "✨ Share to Story"}
-             </Button>
-             <p className="mt-2 text-center text-xs text-muted-foreground">Entertainment reading · not a measured personality or campus ranking.</p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <button
-                onClick={onDownload}
-                disabled={busy !== null}
-                className="flex items-center justify-center gap-2 rounded-xl border border-glass-border py-3 text-sm font-semibold tap active:tap-active disabled:opacity-60"
-              >
-                <Download className="h-4 w-4" />
-                {busy === "download" ? "Saving…" : "Download Image"}
-              </button>
-              <button
-                onClick={onPostToFeed}
-                disabled={busy !== null}
-                className="flex items-center justify-center gap-2 rounded-xl border border-glass-border py-3 text-sm font-semibold tap active:tap-active disabled:opacity-60"
-              >
-                <Send className="h-4 w-4" />
-                {busy === "post" ? "Posting…" : "Post to Vibe Feed"}
-              </button>
-            </div>
-            {notice && (
-              <p aria-live="polite" className="mt-3 text-center text-xs text-muted-foreground">
-                {notice}
-              </p>
-            )}
-          </section>
-          </div>
+        {resultOpen && daily.day && (
+          <AuraCardModal
+            card={dailyCard}
+            live={live}
+            palette={palette}
+            streak={daily.streakCount}
+            activity={activity}
+            onClose={() => setResultOpen(false)}
+            onShared={daily.recordShare}
+          />
         )}
         {card && !resultOpen && <Button variant="outline" className="mt-4 w-full" onClick={() => setResultOpen(true)}><Sparkles />View your Aura Card</Button>}
 

@@ -55,3 +55,8 @@ Store approval, complete privacy compliance and production safety certification 
 - [x] Nov 9 Reels: neon header, Chokotha portraits and 32px engagement icons; share/download choices. Header and Create Reel verified live at 320/384/1280px; creator layout and download verified with temporary browser fixtures only. Live inventory unavailable; live-media sharing remains unverified.
 - [ ] Living Aura: activity-based midnight evolution, morning notification, consecutive check/share streak, daily prompt, full-screen 9:16 chamfered neon card and story export. Actual story posting must not be claimed without platform confirmation.
 - [x] Secrets link: prominent side-by-side frosted Copy Link and glowing purple-pink Share Link pills below the URL; checked at 384px phone width.
+
+## Nov 11 request
+- [ ] Living Aura: finish daily 3D card, banner, story preview and verify on phone width.
+- [ ] Reels redesign to match the uploaded reference: dark + light themes, top bar, 9:16 snap feed, double-tap heart, tap play/pause, right sidebar, info panel with audio ticker, glass bottom nav; export ReelsView.
+- [ ] Reel Creator Studio: flip/flash, 15/30/60s multi-segment recorder with pause/undo, music picker with trim, filters, text/stickers, gallery import, publish screen (cover, caption, hashtags, tags, privacy). Publishing stays private until storage + moderation are live.

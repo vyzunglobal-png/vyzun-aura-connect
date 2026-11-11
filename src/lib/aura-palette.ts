@@ -4,7 +4,7 @@
  */
 export type AuraColor = { name: string; token: string };
 
-export const AURA_COLORS: { name: string; token: string; hue: number }[] = [
+export const AURA_COLORS: (AuraColor & { hue: number })[] = [
   { name: "Ember Coral", token: "var(--aura-coral)", hue: 15 },
   { name: "Stellar Gold", token: "var(--aura-gold)", hue: 50 },
   { name: "Jade Pulse", token: "var(--aura-jade)", hue: 150 },
@@ -15,7 +15,7 @@ export const AURA_COLORS: { name: string; token: string; hue: number }[] = [
 ];
 
 export const DEFAULT_PALETTE: AuraColor[] = ["Mythic Violet", "Neon Aqua", "Cosmic Rose", "Stellar Gold"].map(
-  (name) => AURA_COLORS.find((c) => c.name === name)!,
+  (name) => { const { name: n, token } = AURA_COLORS.find((c) => c.name === name)!; return { name: n, token }; },
 );
 
 const hueDistance = (a: number, b: number) => {
